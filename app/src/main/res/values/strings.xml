@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DrawerListDemo</string>
+    <string name="title">标题</string>
+    <string name="tag">·</string>
+    <string name="name">电影名称</string>
+    <string name="introduce">我是很长很长很长很长很长很长很长很长很长很长的介绍</string>
+    <string name="open">打开</string>
+    <string name="close">关闭</string>
+</resources>
