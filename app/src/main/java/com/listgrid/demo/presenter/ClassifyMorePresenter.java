@@ -1,5 +1,6 @@
 package com.listgrid.demo.presenter;
 
+import android.os.Build;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.leanback.widget.Presenter;
 
 import com.listgrid.demo.R;
-import com.listgrid.demo.utils.logger.Logger;
 
 public class ClassifyMorePresenter extends Presenter {
-
-    private boolean canLeft = false;
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -29,6 +27,7 @@ public class ClassifyMorePresenter extends Presenter {
         MyViewHolder holder = (MyViewHolder) viewHolder;
 
         final View root = holder.view;
+        final View bgView = holder.bgView;
         final TextView mTitle = holder.tvTitle;
         final ImageView mIvTag = holder.mIvTag;
 
@@ -39,8 +38,29 @@ public class ClassifyMorePresenter extends Presenter {
             public void onFocusChange(View view, boolean hasFocus) {
             if (hasFocus){
                 root.setSelected(false);
+                bgView.setSelected(true);
                 mIvTag.setVisibility(View.INVISIBLE);
+                if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.LOLLIPOP){
+                    bgView.animate().scaleX(1f).scaleY(1f).setDuration(100).translationZ(1).start();
+                    mTitle.animate().scaleX(1f).scaleY(1f).setDuration(100).translationZ(1).start();
+                }else {
+                    bgView.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
+                    bgView.invalidate();
+                    mTitle.invalidate();
+                }
+            }else {
+                bgView.setSelected(false);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    bgView.animate().scaleX(1f).scaleY(1f).setDuration(100).translationZ(0).start();
+                }else {
+                    bgView.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
+                }
             }
+
+            if (onItemEventListener != null){
+                onItemEventListener.onItemFocus(hasFocus);
+            }
+
             }
         };
 
@@ -49,11 +69,10 @@ public class ClassifyMorePresenter extends Presenter {
         root.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
-//                Logger.i("keyEvent.getAction()："+ keyEvent.getAction());
-//                Logger.i("keyEvent.getKeyCode()："+keyEvent.getKeyCode());
-//                Logger.i("canLeft："+canLeft);
                 if(keyEvent.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT){
-//                    canLeft =true;
+                    if (keyEvent.getAction() == KeyEvent.ACTION_UP){
+                        return true;
+                    }
                     root.setSelected(true);
                     mIvTag.setVisibility(View.VISIBLE);
                     if (onItemEventListener != null){
@@ -65,10 +84,9 @@ public class ClassifyMorePresenter extends Presenter {
                     if (keyEvent.getAction() == KeyEvent.ACTION_UP){
                         return true;
                     }
-                    if (!canLeft && onItemEventListener != null){
+                    if (onItemEventListener != null){
                         onItemEventListener.onItemLeftClick();
                     }
-//                    canLeft = false;
                     return true;
                 }
                 return false;
@@ -82,13 +100,16 @@ public class ClassifyMorePresenter extends Presenter {
     }
 
     static class MyViewHolder extends Presenter.ViewHolder {
+
+        private View bgView;
         private TextView tvTitle;
         private ImageView mIvTag;
 
         public MyViewHolder(View view) {
             super(view);
-            tvTitle = view.findViewById(R.id.tv_more_title);
-            mIvTag = view.findViewById(R.id.iv_tag);
+            bgView = view.findViewById(R.id.bg_more_item);
+            tvTitle = (TextView) view.findViewById(R.id.tv_more_title);
+            mIvTag = (ImageView) view.findViewById(R.id.iv_tag);
         }
     }
 
@@ -102,6 +123,8 @@ public class ClassifyMorePresenter extends Presenter {
         void onItemLeftClick();
 
         void onItemRightClick();
+
+        void onItemFocus(boolean hasFocus);
     }
 
     public void setOnItemEventListener(@Nullable OnItemClickListener l) {

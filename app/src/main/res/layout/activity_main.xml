@@ -1,55 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg"
     android:clipChildren="false"
-    tools:openDrawer="start">
+    android:clipToPadding="false"
+    android:orientation="horizontal"
+    android:background="@mipmap/bg">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:clipChildren="false"
-        android:clipToPadding="false">
-
-        <ImageView
-            android:id="@+id/leftBar"
-            android:layout_width="30dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mLayout"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@mipmap/sidebar"
-            android:visibility="gone"/>
-        
-        <androidx.leanback.widget.VerticalGridView
-            android:id="@+id/rv_catalog2"
-            android:layout_width="198dp"
-            android:layout_height="match_parent"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:background="@mipmap/bg_bar"
             android:clipChildren="false"
-            android:clipToPadding="false"/>
+            android:clipToPadding="false">
 
-        <androidx.leanback.widget.VerticalGridView
-            android:id="@+id/listGridView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:paddingBottom="10dp"
-            app:focusOutSideStart="true"/>
+                <androidx.leanback.widget.VerticalGridView
+                    android:id="@+id/rv_catalog1"
+                    android:layout_width="228dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    app:layout_constraintRight_toLeftOf="@+id/rv_catalog2"/>
 
-    </LinearLayout>
+                <ImageView
+                    android:id="@+id/leftBar"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:background="@mipmap/sidebar"
+                    android:visibility="visible"
+                    app:layout_constraintLeft_toLeftOf="parent"/>
 
-    <androidx.leanback.widget.VerticalGridView
-        android:id="@+id/rv_catalog1"
-        android:layout_width="285dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:clipChildren="false"
-        android:clipToPadding="false"/>
-</androidx.drawerlayout.widget.DrawerLayout>
+                <androidx.leanback.widget.VerticalGridView
+                    android:id="@+id/rv_catalog2"
+                    android:layout_width="158dp"
+                    android:layout_height="match_parent"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    android:background="@mipmap/bg_bar"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    app:layout_constraintLeft_toRightOf="@+id/leftBar"/>
+
+                <androidx.leanback.widget.VerticalGridView
+                    android:id="@+id/listGridView"
+                    android:layout_width="1050dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:paddingBottom="10dp"
+                    app:focusOutSideStart="true"
+                    app:layout_constraintLeft_toRightOf="@+id/rv_catalog2"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

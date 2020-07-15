@@ -2,6 +2,7 @@ package com.listgrid.demo.presenter;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.FocusFinder;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ import com.listgrid.demo.bean.Movie;
 import com.listgrid.demo.utils.Utils;
 import com.listgrid.demo.utils.logger.Logger;
 
+import java.util.List;
+
 public class GridViewPresenter extends Presenter {
 
     @Override
@@ -29,7 +32,6 @@ public class GridViewPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Object item) {
-
         MyViewHolder holder = (MyViewHolder) viewHolder;
 
         final View root = holder.view;
@@ -99,6 +101,33 @@ public class GridViewPresenter extends Presenter {
     }
 
     @Override
+    public void onBindViewHolder(ViewHolder viewHolder, Object item,  List<Object> payloads) {
+        Logger.i("payloads.isEmpty():"+payloads.isEmpty());
+        if (payloads.isEmpty()) {
+            onBindViewHolder(viewHolder, item);
+        } else {
+            MyViewHolder holder = (MyViewHolder) viewHolder;
+            final ImageView mIvPic = holder.mIvPic;
+            final TextView mTvName = holder.mTvName;
+
+            Bundle payload = (Bundle) payloads.get(0);
+            for (String key : payload.keySet()) {
+                switch (key) {
+                    case "KEY_PIC":
+                        //这里可以用payload里的数据，不过data也是新的 也可以用
+                        mIvPic.setBackground(mIvPic.getContext().getResources().getDrawable(payload.getInt("KEY_PIC")));
+                        break;
+                    case "KEY_NAME":
+                        mTvName.setText(payload.getString("KEY_NAME"));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    @Override
     public void onUnbindViewHolder(ViewHolder viewHolder) {
 
     }
@@ -111,9 +140,9 @@ public class GridViewPresenter extends Presenter {
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            mIvPic = itemView.findViewById(R.id.iv_picture);
-            mTvName = itemView.findViewById(R.id.tv_name);
-            mTvIntroduce = itemView.findViewById(R.id.tv_introduce);
+            mIvPic = (ImageView) itemView.findViewById(R.id.iv_picture);
+            mTvName = (TextView) itemView.findViewById(R.id.tv_name);
+            mTvIntroduce = (TextView) itemView.findViewById(R.id.tv_introduce);
         }
     }
 

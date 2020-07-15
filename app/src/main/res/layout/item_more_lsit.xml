@@ -7,6 +7,14 @@
     android:focusable="true"
     android:clickable="true">
 
+    <View
+        android:id="@+id/bg_more_item"
+        android:layout_width="168dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_more_selector"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
     <TextView
         android:id="@+id/tv_more_title"
         android:layout_width="match_parent"
@@ -18,7 +26,6 @@
         android:text="@string/title"
         android:textSize="25sp"
         android:textColor="@drawable/item_more_selector"
-        android:background="@drawable/bg_more_selector"
         android:duplicateParentState="true"/>
 
     <ImageView

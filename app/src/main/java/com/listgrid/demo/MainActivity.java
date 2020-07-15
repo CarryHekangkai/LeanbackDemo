@@ -1,36 +1,35 @@
 package com.listgrid.demo;
 
-import android.graphics.Color;
+import android.animation.ObjectAnimator;
+import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.leanback.widget.FocusHighlightHelper;
+import androidx.leanback.widget.DiffCallback;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.leanback.widget.VerticalGridView;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.listgrid.demo.bean.Model;
 import com.listgrid.demo.bean.Movie;
 import com.listgrid.demo.presenter.ClassifyMainPresenter;
 import com.listgrid.demo.presenter.ClassifyMorePresenter;
 import com.listgrid.demo.presenter.GridViewPresenter;
-import com.listgrid.demo.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
-    private DrawerLayout mDrawerLayout;
+    private ConstraintLayout mLayout;
     private ImageView mLeftBar;
 
     private VerticalGridView mRv1;
@@ -50,16 +49,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        mLayout = findViewById(R.id.mLayout);
+        mLeftBar = (ImageView) findViewById(R.id.leftBar);
 
-        mDrawerLayout = findViewById(R.id.drawer_layout);
-        mLeftBar = findViewById(R.id.leftBar);
+        mRv1 = (VerticalGridView) findViewById(R.id.rv_catalog1);
+        mRv2 = (VerticalGridView) findViewById(R.id.rv_catalog2);
+        mGridRv = (VerticalGridView) findViewById(R.id.listGridView);
 
-        mRv1 = findViewById(R.id.rv_catalog1);
-        mRv2 = findViewById(R.id.rv_catalog2);
-        mGridRv = findViewById(R.id.listGridView);
-
-        // 初始化侧边栏
-        initDrawerView();
+        
+        // 初始化一级分类
+        initRv1();
 
         // 初始化更多分类
         initRv2(stringList);
@@ -68,58 +67,8 @@ public class MainActivity extends AppCompatActivity {
         getMovie1Data();
         initGridRv();
 
-        // 开启侧边栏
-        mDrawerLayout.setScrimColor(Color.TRANSPARENT);
-        mDrawerLayout.openDrawer(GravityCompat.START);
-        mDrawerLayout.getChildAt(0).setTranslationX(Utils.Dp2px(this, 285));
-        mRv1.requestFocus();
+        mRv2.requestFocus();
 
-    }
-
-    private void initDrawerView(){
-//        mLeftBar.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//            @Override
-//            public void onFocusChange(View view, boolean b) {
-//                if (b){
-//                    mLeftBar.setVisibility(View.GONE);
-//                    mDrawerLayout.openDrawer(GravityCompat.START);
-//                    mDrawerLayout.setScrimColor(Color.TRANSPARENT);
-//                }
-//            }
-//        });
-
-        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-                View mContent = mDrawerLayout.getChildAt(0);
-                float scale = 1 - slideOffset;
-//                Logger.i("scale:"+scale);
-
-                //设置内容界面水平和垂直方向偏转量
-                //在滑动时内容界面的宽度为 屏幕宽度减去菜单界面所占宽度
-                mContent.setTranslationX(drawerView.getMeasuredWidth() * (1 - scale));
-                //设置内容界面操作无效（比如有button就会点击无效）
-//                mContent.invalidate();
-            }
-
-            @Override
-            public void onDrawerOpened(@NonNull View drawerView) {
-                mRv1.requestFocus();
-            }
-
-            @Override
-            public void onDrawerClosed(@NonNull View drawerView) {
-                mLeftBar.setVisibility(View.VISIBLE);
-                mRv2.requestFocus();
-            }
-
-            @Override
-            public void onDrawerStateChanged(int newState) {
-
-            }
-        });
-
-        initRv1();  // 初始化一级分类列表
     }
 
     private void initRv1(){
@@ -152,11 +101,38 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(View v) {
-                mDrawerLayout.closeDrawer(GravityCompat.START);
+                ObjectAnimator translation = ObjectAnimator.ofFloat(mLayout, "translationX",  0f);
+                translation.setDuration(500);
+                translation.start();
+                mRv1.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLeftBar.setVisibility(View.VISIBLE);
+                    }
+                },500);
+                mRv2.requestFocus();
+            }
+
+            @Override
+            public void onItemFocus(View v, boolean hasFocus) {
+                if (hasFocus){
+                    if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.LOLLIPOP) {
+                        mRv1.animate().scaleX(1f).scaleY(1f).setDuration(100).translationZ(1).start();
+                    }else {
+                        mRv1.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
+                        mRv1.invalidate();
+                    }
+                }else {
+                    if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.LOLLIPOP) {
+                        mRv1.animate().scaleX(1f).scaleY(1f).setDuration(100).translationZ(0).start();
+                    }else {
+                        mRv1.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
+                    }
+                }
             }
         });
 
-        FocusHighlightHelper.setupHeaderItemFocusHighlight(mainItemBridge);
+//        FocusHighlightHelper.setupHeaderItemFocusHighlight(mainItemBridge);
     }
 
     private void initRv2(String[] array){
@@ -174,15 +150,44 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildViewHolderSelected(RecyclerView parent, RecyclerView.ViewHolder child, int position, int subposition) {
                 super.onChildViewHolderSelected(parent, child, position, subposition);
+
                 if (position%2==0){
                     getMovie1Data();
                 }else {
                     getMovie2Data();
                 }
                 if (mGridRv != null && !mGridRv.isComputingLayout()){   // 避免初始化的时候crash
-                    mGridAdapter.clear();
-                    mGridAdapter.addAll(0, mGridList);
-//                    mListRv.scrollToPosition(0);
+                    mGridAdapter.setItems(mGridList, new DiffCallback() {
+                        @Override
+                        public boolean areItemsTheSame(@NonNull Object oldItem, @NonNull Object newItem) {
+                            return true;
+                        }
+
+                        @Override
+                        public boolean areContentsTheSame(@NonNull Object oldItem, @NonNull Object newItem) {
+//                            Logger.i("areContentsTheSame:"+(((Movie)oldItem).getId() == ((Movie)newItem).getId()));
+                            return ((Movie)oldItem).getId() == ((Movie)newItem).getId();
+                        }
+
+                        @Override
+                        public Object getChangePayload(@NonNull Object oldItem, @NonNull Object newItem) {
+//                            Logger.i("getChangePayload");
+                            Bundle payload = new Bundle();
+                            if (((Movie)oldItem).getId() != ((Movie)newItem).getId()) {
+                                payload.putInt("KEY_PIC", ((Movie) newItem).getId());
+                            }
+                            if (!((Movie)oldItem).getName().equals(((Movie) newItem).getName())) {
+                                payload.putString("KEY_NAME", ((Movie) newItem).getName());
+                            }
+                            if (payload.size() == 0) { //如果没有变化 就传空
+                                return null;
+                            }
+                            return payload;
+                        }
+                    });
+//                    mGridAdapter.clear();
+//                    mGridAdapter.addAll(0, mGridList);
+                    mGridRv.scrollToPosition(0);
                 }
             }
 
@@ -196,20 +201,46 @@ public class MainActivity extends AppCompatActivity {
         morePresenter.setOnItemEventListener(new ClassifyMorePresenter.OnItemClickListener() {
             @Override
             public void onItemLeftClick() {
-                mLeftBar.setVisibility(View.GONE);
-                mDrawerLayout.openDrawer(GravityCompat.START);
+                float dis = mRv1.getMeasuredWidth() - mLeftBar.getMeasuredWidth();
+                ObjectAnimator translation = ObjectAnimator.ofFloat(mLayout, "translationX",  dis);
+                translation.setDuration(500);
+                translation.start();
+
+                mLeftBar.setVisibility(View.INVISIBLE);
+                mRv1.requestFocus();
+
             }
 
             @Override
             public void onItemRightClick() {
                 mGridRv.requestFocus();
             }
+
+            @Override
+            public void onItemFocus(boolean hasFocus) {
+                if (hasFocus){
+                    if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.LOLLIPOP) {
+                        mRv2.animate().scaleX(1f).scaleY(1f).setDuration(100).translationZ(1).start();
+                    }else {
+                        mRv2.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
+                        mRv2.invalidate();
+                    }
+                }else {
+                    if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.LOLLIPOP) {
+                        mRv2.animate().scaleX(1f).scaleY(1f).setDuration(100).translationZ(0).start();
+                    }else {
+                        mRv2.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
+                    }
+                }
+
+            }
         });
 
-        FocusHighlightHelper.setupHeaderItemFocusHighlight(moreItemBridge);
+//        FocusHighlightHelper.setupHeaderItemFocusHighlight(moreItemBridge);
     }
 
     private void initGridRv(){
+
 
         mGridRv.setNumColumns(5);
 
@@ -241,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        FocusHighlightHelper.setupHeaderItemFocusHighlight(gridItemBridge);
+//        FocusHighlightHelper.setupHeaderItemFocusHighlight(gridItemBridge);
     }
 
     private void getMovie1Data(){

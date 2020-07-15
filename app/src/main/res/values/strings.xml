@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DrawerListDemo</string>
+    <string name="app_name">LeanbackDemo</string>
     <string name="title">标题</string>
     <string name="tag">·</string>
     <string name="name">电影名称</string>

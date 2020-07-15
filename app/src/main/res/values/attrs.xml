@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 顶层控件属性 -->
+    <declare-styleable name="MainUpView">
+        <attr name="upImageRes"  format="reference" />
+        <attr name="shadowImageRes"  format="reference" />
+    </declare-styleable>
+
+</resources>

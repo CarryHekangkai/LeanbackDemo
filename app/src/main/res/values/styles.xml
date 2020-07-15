@@ -1,4 +1,8 @@
 <resources>
 
     <style name="AppTheme" parent="@style/Theme.Leanback" />
+
+    <style name="NoTitleBarTheme" parent="android:Theme.Black.NoTitleBar.Fullscreen">
+
+    </style>
 </resources>
